@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datos de pago móvil — Naturaleza Abierta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --moss-050:#eef2ea;
+    --moss-900:#1f3323;
+    --moss-700:#2c4a35;
+    --clay:#c68a3e;
+    --clay-deep:#a8712f;
+    --ink:#221f1a;
+    --paper:#f7f5ee;
+    --line:#d8d6c8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--moss-050);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:480px; margin:0 auto; padding:48px 24px 64px; }
+  .leaf{ width:38px;height:38px;margin-bottom:22px; }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:2rem;
+    line-height:1.15;
+    margin:0 0 10px;
+    color:var(--moss-900);
+    letter-spacing:-0.01em;
+  }
+  .sub{ color:#5b5648; font-size:0.98rem; margin:0 0 30px; max-width:40ch; }
+  .banda-afiliado{
+    background:var(--paper);
+    border:1.5px solid var(--line);
+    border-left:4px solid var(--clay);
+    border-radius:4px;
+    padding:14px 16px;
+    margin-bottom:28px;
+    font-size:0.9rem;
+    color:var(--moss-700);
+  }
+  .banda-afiliado b{ color:var(--clay-deep); }
+  form{ display:flex; flex-direction:column; gap:18px; }
+  label{
+    display:block;
+    font-size:0.85rem;
+    color:var(--moss-700);
+    margin-bottom:7px;
+    font-weight:500;
+  }
+  input, select{
+    width:100%;
+    padding:13px 14px;
+    border:1.5px solid var(--line);
+    border-radius:3px;
+    background:var(--paper);
+    font-family:'Work Sans',sans-serif;
+    font-size:1rem;
+    color:var(--ink);
+    transition:border-color .15s ease;
+  }
+  input:focus, select:focus{ outline:none; border-color:var(--moss-700); }
+  select{ appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%232c4a35' stroke-width='1.6' fill='none'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; }
+  button, .btn-principal{
+    display:block;
+    margin-top:12px;
+    padding:15px 20px;
+    border:none;
+    border-radius:3px;
+    background:var(--moss-700);
+    color:#fff;
+    font-family:'Work Sans',sans-serif;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    text-align:center;
+    text-decoration:none;
+    transition:background .15s ease;
+  }
+  button:hover, .btn-principal:hover{ background:var(--moss-900); }
+  button:disabled{ background:#9aa596; cursor:default; }
+  .err{ display:none; color:#8a3b2c; font-size:0.88rem; margin-top:-6px; }
+  .state{ display:none; text-align:center; padding-top:30px; }
+  .state.show{ display:block; }
+  form.hide{ display:none; }
+  .check{ width:52px;height:52px;margin:0 auto 20px; }
+  .state h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:1.5rem;
+    color:var(--moss-900);
+    margin:0 0 8px;
+  }
+  .state p{ color:#5b5648; font-size:0.95rem; }
+  .caja-codigo{
+    background:var(--moss-900);
+    border-radius:6px;
+    padding:22px;
+    margin-top:24px;
+    text-align:left;
+  }
+  .caja-codigo .etiqueta{ color:#a9c2ac; font-size:0.8rem; margin-bottom:4px; }
+  .caja-codigo .codigo{
+    font-family:'Fraunces',serif;
+    color:#fff;
+    font-size:1.6rem;
+    letter-spacing:0.02em;
+    margin-bottom:16px;
+  }
+  .caja-codigo a{
+    display:block;
+    color:#d7e8da;
+    font-size:0.88rem;
+    word-break:break-all;
+    margin-bottom:10px;
+    text-decoration:underline;
+  }
+  footer{
+    margin-top:52px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:0.82rem;
+    color:#8a8672;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <svg class="leaf" viewBox="0 0 40 40" fill="none">
+    <path d="M20 35C20 35 6 28 6 14C6 10 8 6 12 6C16 6 20 10 20 16C20 10 24 6 28 6C32 6 34 10 34 14C34 28 20 35 20 35Z" stroke="#2c4a35" stroke-width="1.6"/>
+    <path d="M20 35V16" stroke="#2c4a35" stroke-width="1.4"/>
+  </svg>
+
+  <h1>Un último paso</h1>
+  <p class="sub">Antes de darte tu código de afiliado, certifícanos los datos donde te pagaremos tus comisiones más adelante.</p>
+
+  <div class="banda-afiliado">Estos datos son <b>solo para registrarte como afiliado</b> — cuando alguien compre con tu código, aquí es donde te llegará tu comisión.</div>
+
+  <form id="f">
+    <div>
+      <label for="banco">Nombre del banco</label>
+      <input type="text" id="banco" required placeholder="Ej: Banesco">
+    </div>
+    <div>
+      <label for="telefonoPago">Número de teléfono (Pago Móvil)</label>
+      <input type="tel" id="telefonoPago" required placeholder="0412...">
+    </div>
+    <div>
+      <label for="cedula">Número de cédula</label>
+      <input type="text" id="cedula" required>
+    </div>
+
+    <p class="err" id="err">No pudimos guardar tus datos. Verifica el link o inténtalo de nuevo.</p>
+    <button type="submit" id="btn">Registrarme como afiliado</button>
+  </form>
+
+  <div class="state" id="ok">
+    <svg class="check" viewBox="0 0 52 52" fill="none">
+      <circle cx="26" cy="26" r="24" stroke="#2c4a35" stroke-width="1.6"/>
+      <path d="M16 27l7 7 14-15" stroke="#2c4a35" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h2>¡Listo, ya eres afiliado!</h2>
+    <p>Guarda este código, también te lo repite Valentina por WhatsApp.</p>
+
+    <div class="caja-codigo">
+      <div class="etiqueta">Tu código</div>
+      <div class="codigo" id="codigoTexto">NA-00000</div>
+      <a id="linkCatalogo" href="#" target="_blank" rel="noopener">🔗 Tu catálogo para compartir</a>
+      <a id="linkCreativos" href="#" target="_blank" rel="noopener">🎨 Tus creativos listos</a>
+    </div>
+    <a id="btnWhatsapp" class="btn-principal" style="display:block;text-decoration:none;text-align:center;margin-top:18px;" target="_blank" rel="noopener">Volver a WhatsApp ✅</a>
+  </div>
+
+  <div class="state" id="badlink">
+    <h2>Este link ya no es válido</h2>
+    <p>Escríbele a Valentina por WhatsApp para que te mande uno nuevo.</p>
+  </div>
+
+  <footer>Naturaleza Abierta</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/supabase/2.45.4/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = "https://tgvcvnhrwswuxgjbpvwq.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_EKV8OM1y96u-DV_kUPGwkg_BZuGdf4D";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const WEBHOOK_MINI_FORMULARIOS = "https://hook.us2.make.com/mq6evphde7l2rhlyz0dosqgg4kspvks1";
+
+  function normalizarTelWa(t){
+    if(!t) return null;
+    let d = t.replace(/\D/g,'');
+    if(d.startsWith('0')) d = '58' + d.slice(1);
+    else if(!d.startsWith('58')) d = '58' + d;
+    return d;
+  }
+
+  async function notificarValentina(payload){
+    try{
+      const res = await fetch(WEBHOOK_MINI_FORMULARIOS, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      return res.ok;
+    }catch(ex){ return false; }
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const compraId = params.get("compra");
+  const telWa = normalizarTelWa(params.get("tel"));
+
+  const form = document.getElementById("f");
+  const err = document.getElementById("err");
+  const btn = document.getElementById("btn");
+
+  if(!compraId){
+    form.classList.add("hide");
+    document.getElementById("badlink").classList.add("show");
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    err.style.display = "none";
+    btn.disabled = true;
+    btn.textContent = "Registrando...";
+
+    const banco = document.getElementById("banco").value.trim();
+    const telefonoPago = document.getElementById("telefonoPago").value.trim();
+    const cedula = document.getElementById("cedula").value.trim();
+
+    try{
+      const { data, error } = await sb.rpc("fn_registrar_datos_pago_movil", {
+        p_compra_id: compraId,
+        p_banco: banco,
+        p_telefono_pago: telefonoPago,
+        p_cedula: cedula
+      });
+      if(error || !data || data.ok === false){
+        throw new Error(error?.message || data?.error || "fallo");
+      }
+      form.classList.add("hide");
+      document.getElementById("codigoTexto").textContent = data.codigo_propio;
+      document.getElementById("linkCatalogo").href = data.link_catalogo;
+      document.getElementById("linkCreativos").href = data.link_creativos;
+
+      const enviado = telWa ? await notificarValentina({
+        formulario: "datos_pago_movil",
+        telefono: telWa,
+        compra_id: compraId,
+        codigo_propio: data.codigo_propio,
+        link_catalogo: data.link_catalogo,
+        link_creativos: data.link_creativos
+      }) : false;
+
+      const btnWa = document.getElementById("btnWhatsapp");
+      if(enviado){
+        btnWa.style.display = "none";
+      } else {
+        const msg = `✅ Listo, ya registré mis datos de pago móvil. Mi código es ${data.codigo_propio}.`;
+        btnWa.href = `https://wa.me/584221482602?text=${encodeURIComponent(msg)}`;
+      }
+      document.getElementById("ok").classList.add("show");
+    }catch(ex){
+      err.style.display = "block";
+      btn.disabled = false;
+      btn.textContent = "Registrarme como afiliado";
+    }
+  });
+</script>
+</body>
+</html>
