@@ -142,12 +142,12 @@
     <path d="M20 35V16" stroke="#2c4a35" stroke-width="1.4"/>
   </svg>
 
-  <h1>Un último paso</h1>
-  <p class="sub">Antes de darte tu código de afiliado, certifícanos los datos donde te pagaremos tus comisiones más adelante.</p>
+  <h1 id="tituloH1">Un último paso</h1>
+  <p class="sub" id="subP">Antes de darte tu código de afiliado, certifícanos los datos donde te pagaremos tus comisiones más adelante.</p>
 
-  <div class="banda-afiliado">Estos datos son <b>solo para registrarte como afiliado</b> — cuando alguien compre con tu código, aquí es donde te llegará tu comisión.</div>
+  <div class="banda-afiliado" id="bandaAfiliado">Estos datos son <b>solo para registrarte como afiliado</b> — cuando alguien compre con tu código, aquí es donde te llegará tu comisión.</div>
 
-  <form id="f">
+  <form id="f" autocomplete="off" onsubmit="return false">
     <div>
       <label for="banco">Nombre del banco</label>
       <input type="text" id="banco" required placeholder="Ej: Banesco">
@@ -182,6 +182,21 @@
     <a id="btnWhatsapp" class="btn-principal" style="display:block;text-decoration:none;text-align:center;margin-top:18px;" target="_blank" rel="noopener">Volver a WhatsApp ✅</a>
   </div>
 
+  <div class="state" id="yaRegistrado">
+    <svg class="check" viewBox="0 0 52 52" fill="none">
+      <circle cx="26" cy="26" r="24" stroke="#2c4a35" stroke-width="1.6"/>
+      <path d="M16 27l7 7 14-15" stroke="#2c4a35" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h2>Ya recibimos tus datos</h2>
+    <p>Tu registro de afiliado ya quedó hecho antes. Si necesitas cambiar tus datos de pago, escríbele a un asesor por WhatsApp.</p>
+    <a id="btnWhatsappYaReg" class="btn-principal" style="display:inline-block;text-decoration:none;margin-top:14px;" target="_blank" rel="noopener">Ir a WhatsApp</a>
+  </div>
+
+  <div class="state" id="noPagado">
+    <h2>Tu compra aún no está confirmada</h2>
+    <p>En cuanto se confirme tu pago vas a poder registrarte como afiliado. Escríbele a Valentina si tienes dudas.</p>
+  </div>
+
   <div class="state" id="badlink">
     <h2>Este link ya no es válido</h2>
     <p>Escríbele a Valentina por WhatsApp para que te mande uno nuevo.</p>
@@ -190,11 +205,33 @@
   <footer>Naturaleza Abierta</footer>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/supabase/2.45.4/supabase.min.js"></script>
 <script>
+  // ---- Cliente minimo a Supabase (sin CDN, fetch directo al REST/RPC) ----
   const SUPABASE_URL = "https://tgvcvnhrwswuxgjbpvwq.supabase.co";
   const SUPABASE_KEY = "sb_publishable_EKV8OM1y96u-DV_kUPGwkg_BZuGdf4D";
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const sb = {
+    rpc: async function(fn, params){
+      try{
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_KEY
+          },
+          body: JSON.stringify(params || {})
+        });
+        let data = null;
+        try{ data = await res.json(); }catch(_){ data = null; }
+        if(!res.ok){
+          return { data: null, error: { message: (data && (data.message || data.error)) || `HTTP ${res.status}` } };
+        }
+        return { data, error: null };
+      }catch(ex){
+        return { data: null, error: { message: ex.message || "fallo de red" } };
+      }
+    }
+  };
 
   const WEBHOOK_MINI_FORMULARIOS = "https://hook.us2.make.com/mq6evphde7l2rhlyz0dosqgg4kspvks1";
 
@@ -225,10 +262,51 @@
   const err = document.getElementById("err");
   const btn = document.getElementById("btn");
 
-  if(!compraId){
+  const STORAGE_KEY = compraId ? `afiliado_enviado_${compraId}` : null;
+
+  function ocultarTodo(){
     form.classList.add("hide");
-    document.getElementById("badlink").classList.add("show");
+    document.getElementById("ok").classList.remove("show");
+    document.getElementById("yaRegistrado").classList.remove("show");
+    document.getElementById("noPagado").classList.remove("show");
+    document.getElementById("badlink").classList.remove("show");
   }
+
+  function mostrarOkGuardado(data){
+    ocultarTodo();
+    document.getElementById("codigoTexto").textContent = data.codigo_propio;
+    document.getElementById("linkCatalogo").href = data.link_catalogo;
+    document.getElementById("linkCreativos").href = data.link_creativos;
+    const btnWa = document.getElementById("btnWhatsapp");
+    const msg = `✅ Listo, ya registré mis datos de pago móvil. Mi código es ${data.codigo_propio}.`;
+    btnWa.href = `https://wa.me/584221482602?text=${encodeURIComponent(msg)}`;
+    document.getElementById("ok").classList.add("show");
+  }
+
+  // Si el navegador ya envió este formulario antes (mismo compra_id), no dejar volver a llenarlo.
+  function revisarEnvioPrevio(){
+    if(!STORAGE_KEY) return false;
+    try{
+      const guardado = localStorage.getItem(STORAGE_KEY);
+      if(guardado){
+        mostrarOkGuardado(JSON.parse(guardado));
+        return true;
+      }
+    }catch(_){ /* localStorage no disponible: seguimos igual */ }
+    return false;
+  }
+
+  if(!compraId){
+    ocultarTodo();
+    document.getElementById("badlink").classList.add("show");
+  } else if(!revisarEnvioPrevio()){
+    // formulario visible por defecto
+  }
+
+  // Si el usuario vuelve con el boton "atras" del navegador (bfcache), re-chequear.
+  window.addEventListener("pageshow", () => {
+    if(compraId) revisarEnvioPrevio();
+  });
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -240,42 +318,59 @@
     const telefonoPago = document.getElementById("telefonoPago").value.trim();
     const cedula = document.getElementById("cedula").value.trim();
 
-    try{
-      const { data, error } = await sb.rpc("fn_registrar_datos_pago_movil", {
-        p_compra_id: compraId,
-        p_banco: banco,
-        p_telefono_pago: telefonoPago,
-        p_cedula: cedula
-      });
-      if(error || !data || data.ok === false){
-        throw new Error(error?.message || data?.error || "fallo");
-      }
-      form.classList.add("hide");
-      document.getElementById("codigoTexto").textContent = data.codigo_propio;
-      document.getElementById("linkCatalogo").href = data.link_catalogo;
-      document.getElementById("linkCreativos").href = data.link_creativos;
+    const { data, error } = await sb.rpc("fn_registrar_datos_pago_movil", {
+      p_compra_id: compraId,
+      p_banco: banco,
+      p_telefono_pago: telefonoPago,
+      p_cedula: cedula,
+      p_tel_wa: telWa
+    });
 
-      const enviado = telWa ? await notificarValentina({
-        formulario: "datos_pago_movil",
-        telefono: telWa,
-        compra_id: compraId,
-        codigo_propio: data.codigo_propio,
-        link_catalogo: data.link_catalogo,
-        link_creativos: data.link_creativos
-      }) : false;
+    if(error || !data || data.ok === false){
+      const codigoError = (data && data.error) || (error && error.message) || "fallo";
 
-      const btnWa = document.getElementById("btnWhatsapp");
-      if(enviado){
-        btnWa.style.display = "none";
-      } else {
-        const msg = `✅ Listo, ya registré mis datos de pago móvil. Mi código es ${data.codigo_propio}.`;
-        btnWa.href = `https://wa.me/584221482602?text=${encodeURIComponent(msg)}`;
+      if(codigoError === "ya_registrado"){
+        ocultarTodo();
+        const btnWaReg = document.getElementById("btnWhatsappYaReg");
+        btnWaReg.href = `https://wa.me/584221482602?text=${encodeURIComponent("Hola, ya me registré como afiliado antes y necesito ayuda con mis datos de pago.")}`;
+        document.getElementById("yaRegistrado").classList.add("show");
+        return;
       }
-      document.getElementById("ok").classList.add("show");
-    }catch(ex){
+      if(codigoError === "compra_no_pagada"){
+        ocultarTodo();
+        document.getElementById("noPagado").classList.add("show");
+        return;
+      }
+      if(codigoError === "link_invalido" || codigoError === "compra no encontrada"){
+        ocultarTodo();
+        document.getElementById("badlink").classList.add("show");
+        return;
+      }
+
       err.style.display = "block";
       btn.disabled = false;
       btn.textContent = "Registrarme como afiliado";
+      return;
+    }
+
+    // Exito: guardamos para que el link ya no se pueda volver a llenar desde este navegador.
+    try{
+      if(STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }catch(_){ /* si no se puede guardar, igual mostramos el resultado */ }
+
+    mostrarOkGuardado(data);
+
+    const enviado = telWa ? await notificarValentina({
+      formulario: "datos_pago_movil",
+      telefono: telWa,
+      compra_id: compraId,
+      codigo_propio: data.codigo_propio,
+      link_catalogo: data.link_catalogo,
+      link_creativos: data.link_creativos
+    }) : false;
+
+    if(enviado){
+      document.getElementById("btnWhatsapp").style.display = "none";
     }
   });
 </script>
