@@ -125,6 +125,29 @@
     margin-bottom:10px;
     text-decoration:underline;
   }
+  .nota-bcv{
+    display:none;
+    background:#fdf3e3;
+    border:1.5px solid #ecd6ab;
+    border-radius:4px;
+    padding:12px 14px;
+    font-size:0.85rem;
+    color:var(--clay-deep);
+    margin-top:-6px;
+  }
+  .nota-bcv.show{ display:block; }
+  .separador{
+    border:none;
+    border-top:1.5px solid var(--line);
+    margin:8px 0 2px;
+  }
+  .titulo-seccion{
+    font-family:'Fraunces',serif;
+    font-size:1.05rem;
+    color:var(--moss-900);
+    margin:0 0 -6px;
+  }
+  .ayuda-campo{ font-size:0.8rem; color:#8a8672; margin-top:-10px; }
   footer{
     margin-top:52px;
     padding-top:20px;
@@ -149,16 +172,48 @@
 
   <form id="f" autocomplete="off" onsubmit="return false">
     <div>
-      <label for="banco">Nombre del banco</label>
-      <input type="text" id="banco" required placeholder="Ej: Banesco">
+      <label for="metodoPago">¿Cómo quieres que te paguemos tus comisiones?</label>
+      <select id="metodoPago" required>
+        <option value="" disabled selected>Cargando métodos…</option>
+      </select>
+    </div>
+
+    <p class="nota-bcv" id="notaBcv">💱 Los pagos por este método se calculan a la <b>tasa BCV</b> del día en que se procese tu pago, no 1 a 1 en dólares. Por ejemplo, si tu panel muestra $100 en saldo, lo que recibas en este método puede equivaler a menos de $100. Te lo detallamos siempre en el correo de cada pago.</p>
+
+    <!-- Campos para Pago Móvil -->
+    <div id="camposPagoMovil">
+      <div>
+        <label for="banco">Nombre del banco</label>
+        <input type="text" id="banco" placeholder="Ej: Banesco">
+      </div>
+      <div>
+        <label for="telefonoPago">Número de teléfono (Pago Móvil)</label>
+        <input type="tel" id="telefonoPago" placeholder="0412...">
+      </div>
+      <div>
+        <label for="cedula">Número de cédula</label>
+        <input type="text" id="cedula">
+      </div>
+    </div>
+
+    <!-- Campo para otros metodos (PayPal, Binance, Zelle, Zinli...) -->
+    <div id="camposOtroMetodo" style="display:none;">
+      <div>
+        <label for="cuentaOtroMetodo" id="labelCuentaOtroMetodo">Correo o usuario de tu cuenta</label>
+        <input type="text" id="cuentaOtroMetodo" placeholder="tucorreo@ejemplo.com">
+      </div>
+    </div>
+
+    <hr class="separador">
+    <p class="titulo-seccion">Acceso a tu panel de afiliado</p>
+    <p class="ayuda-campo">Con esto activamos de una vez tu usuario para que entres a ver tus comisiones y tu red — no tienes que registrarte por separado después.</p>
+    <div>
+      <label for="correoAcceso">Tu correo</label>
+      <input type="email" id="correoAcceso" required placeholder="tucorreo@ejemplo.com">
     </div>
     <div>
-      <label for="telefonoPago">Número de teléfono (Pago Móvil)</label>
-      <input type="tel" id="telefonoPago" required placeholder="0412...">
-    </div>
-    <div>
-      <label for="cedula">Número de cédula</label>
-      <input type="text" id="cedula" required>
+      <label for="claveAcceso">Crea una contraseña</label>
+      <input type="password" id="claveAcceso" required placeholder="Mínimo 6 caracteres" minlength="6">
     </div>
 
     <p class="err" id="err">No pudimos guardar tus datos. Verifica el link o inténtalo de nuevo.</p>
@@ -170,8 +225,8 @@
       <circle cx="26" cy="26" r="24" stroke="#2c4a35" stroke-width="1.6"/>
       <path d="M16 27l7 7 14-15" stroke="#2c4a35" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <h2>¡Listo, ya eres afiliado!</h2>
-    <p>Guarda este código, también te lo repite Valentina por WhatsApp.</p>
+    <h2 id="tituloOk">¡Listo, ya eres afiliado!</h2>
+    <p>Guarda este código, también te lo repite Valentina por WhatsApp. En un momento te llega ahí mismo el link a tu panel, ya con tu correo y contraseña activos.</p>
 
     <div class="caja-codigo">
       <div class="etiqueta">Tu código</div>
@@ -261,6 +316,47 @@
   const form = document.getElementById("f");
   const err = document.getElementById("err");
   const btn = document.getElementById("btn");
+  const selectMetodo = document.getElementById("metodoPago");
+  const notaBcv = document.getElementById("notaBcv");
+  const camposPagoMovil = document.getElementById("camposPagoMovil");
+  const camposOtroMetodo = document.getElementById("camposOtroMetodo");
+  const labelCuentaOtroMetodo = document.getElementById("labelCuentaOtroMetodo");
+  const cuentaOtroMetodo = document.getElementById("cuentaOtroMetodo");
+
+  const ETIQUETAS_CUENTA = {
+    "PayPal": "Correo de tu cuenta PayPal",
+    "Binance": "Correo o ID de usuario de Binance",
+    "Zelle": "Correo o teléfono asociado a tu Zelle",
+    "Zinli": "Correo de tu cuenta Zinli"
+  };
+
+  async function cargarMetodosPago(){
+    const { data, error } = await sb.rpc("fn_metodos_pago_tipos_activos", {});
+    selectMetodo.innerHTML = "";
+    let tipos = (!error && Array.isArray(data)) ? data.map(r => r.tipo) : [];
+    if(tipos.length === 0) tipos = ["Pago Móvil","Zelle","Binance","PayPal","Zinli"];
+    tipos.forEach(tipo => {
+      const opt = document.createElement("option");
+      opt.value = tipo; opt.textContent = tipo;
+      selectMetodo.appendChild(opt);
+    });
+    actualizarCamposMetodo();
+  }
+
+  function actualizarCamposMetodo(){
+    const metodo = selectMetodo.value;
+    const esPagoMovil = metodo === "Pago Móvil";
+    camposPagoMovil.style.display = esPagoMovil ? "" : "none";
+    camposOtroMetodo.style.display = esPagoMovil ? "none" : "";
+    notaBcv.classList.toggle("show", !esPagoMovil);
+    document.getElementById("banco").required = esPagoMovil;
+    document.getElementById("telefonoPago").required = esPagoMovil;
+    document.getElementById("cedula").required = esPagoMovil;
+    cuentaOtroMetodo.required = !esPagoMovil;
+    labelCuentaOtroMetodo.textContent = ETIQUETAS_CUENTA[metodo] || "Correo o usuario de tu cuenta";
+  }
+  selectMetodo.addEventListener("change", actualizarCamposMetodo);
+  cargarMetodosPago();
 
   const STORAGE_KEY = compraId ? `afiliado_enviado_${compraId}` : null;
 
@@ -274,6 +370,7 @@
 
   function mostrarOkGuardado(data){
     ocultarTodo();
+    document.getElementById("tituloOk").textContent = data.es_distribuidor ? "¡Listo, ya eres distribuidor!" : "¡Listo, ya eres afiliado!";
     document.getElementById("codigoTexto").textContent = data.codigo_propio;
     document.getElementById("linkCatalogo").href = data.link_catalogo;
     document.getElementById("linkCreativos").href = data.link_creativos;
@@ -314,16 +411,24 @@
     btn.disabled = true;
     btn.textContent = "Registrando...";
 
-    const banco = document.getElementById("banco").value.trim();
-    const telefonoPago = document.getElementById("telefonoPago").value.trim();
-    const cedula = document.getElementById("cedula").value.trim();
+    const metodo = selectMetodo.value;
+    const esPagoMovil = metodo === "Pago Móvil";
+    const banco = esPagoMovil ? document.getElementById("banco").value.trim() : "";
+    const telefonoPago = esPagoMovil ? document.getElementById("telefonoPago").value.trim() : "";
+    const cedula = esPagoMovil ? document.getElementById("cedula").value.trim() : "";
+    const cuentaOtro = !esPagoMovil ? cuentaOtroMetodo.value.trim() : "";
+    const correoAcceso = document.getElementById("correoAcceso").value.trim();
+    const claveAcceso = document.getElementById("claveAcceso").value;
 
     const { data, error } = await sb.rpc("fn_registrar_datos_pago_movil", {
       p_compra_id: compraId,
       p_banco: banco,
       p_telefono_pago: telefonoPago,
       p_cedula: cedula,
-      p_tel_wa: telWa
+      p_numero_cuenta: cuentaOtro,
+      p_correo: correoAcceso,
+      p_tel_wa: telWa,
+      p_metodo_pago: metodo
     });
 
     if(error || !data || data.ok === false){
@@ -366,7 +471,11 @@
       compra_id: compraId,
       codigo_propio: data.codigo_propio,
       link_catalogo: data.link_catalogo,
-      link_creativos: data.link_creativos
+      link_creativos: data.link_creativos,
+      metodo_pago: metodo,
+      es_distribuidor: !!data.es_distribuidor,
+      correo_acceso: correoAcceso,
+      clave_acceso: claveAcceso
     }) : false;
 
     if(enviado){
