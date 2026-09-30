@@ -297,6 +297,7 @@
   const params = new URLSearchParams(window.location.search);
   const compraId = params.get("compra");
   const telWa = normalizarTelWa(params.get("tel"));
+  const tokenCompra = params.get("t") || null;
 
   const form = document.getElementById("f");
   const err = document.getElementById("err");
@@ -381,7 +382,8 @@
       p_telefono_pago: telefonoPago,
       p_cedula: cedula,
       p_correo: correo,
-      p_tel_wa: telWa
+      p_tel_wa: telWa,
+      p_token: tokenCompra
     });
 
     if(error || !data || data.ok === false){
@@ -389,7 +391,7 @@
 
       if(codigoError === "ya_registrado"){
         // Si el registro ya existía pero sin cuenta de acceso, la vinculamos con la sesión recién creada.
-        const v2 = await sb.rpc("vincular_afiliado_por_compra", { p_compra_id: compraId, p_tel_wa: telWa }, ses.token);
+        const v2 = await sb.rpc("vincular_afiliado_por_compra", { p_compra_id: compraId, p_tel_wa: telWa, p_token: tokenCompra }, ses.token);
         if(v2.data && v2.data.ok){
           document.querySelector("#yaRegistrado p").textContent = "Tu registro ya estaba hecho y ahora tu acceso al portal quedó activado con ese correo. Entra en " + URL_PORTAL;
         }
@@ -415,7 +417,7 @@
     }
 
     // Vincula la cuenta recién creada con el afiliado de esta compra (usa la sesión del usuario).
-    const vin = await sb.rpc("vincular_afiliado_por_compra", { p_compra_id: compraId, p_tel_wa: telWa }, ses.token);
+    const vin = await sb.rpc("vincular_afiliado_por_compra", { p_compra_id: compraId, p_tel_wa: telWa, p_token: tokenCompra }, ses.token);
     data.correo = correo;
     data.acceso_ok = !vin.error && !(vin.data && vin.data.ok === false);
 
@@ -445,4 +447,3 @@
 </script>
 </body>
 </html>
-
