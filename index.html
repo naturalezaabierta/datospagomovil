@@ -89,6 +89,7 @@
   }
   button:hover, .btn-principal:hover{ background:var(--moss-900); }
   button:disabled{ background:#9aa596; cursor:default; }
+  .nota{ font-size:0.85rem; color:#5b5648; margin:-6px 0 0; }
   .err{ display:none; color:#8a3b2c; font-size:0.88rem; margin-top:-6px; }
   .state{ display:none; text-align:center; padding-top:30px; }
   .state.show{ display:block; }
@@ -125,29 +126,6 @@
     margin-bottom:10px;
     text-decoration:underline;
   }
-  .nota-bcv{
-    display:none;
-    background:#fdf3e3;
-    border:1.5px solid #ecd6ab;
-    border-radius:4px;
-    padding:12px 14px;
-    font-size:0.85rem;
-    color:var(--clay-deep);
-    margin-top:-6px;
-  }
-  .nota-bcv.show{ display:block; }
-  .separador{
-    border:none;
-    border-top:1.5px solid var(--line);
-    margin:8px 0 2px;
-  }
-  .titulo-seccion{
-    font-family:'Fraunces',serif;
-    font-size:1.05rem;
-    color:var(--moss-900);
-    margin:0 0 -6px;
-  }
-  .ayuda-campo{ font-size:0.8rem; color:#8a8672; margin-top:-10px; }
   footer{
     margin-top:52px;
     padding-top:20px;
@@ -166,55 +144,36 @@
   </svg>
 
   <h1 id="tituloH1">Un último paso</h1>
-  <p class="sub" id="subP">Antes de darte tu código de afiliado, certifícanos los datos donde te pagaremos tus comisiones más adelante.</p>
+  <p class="sub" id="subP">Antes de darte tu código de afiliado, certifícanos dónde te pagaremos tus comisiones y crea tu acceso al portal de afiliado.</p>
 
   <div class="banda-afiliado" id="bandaAfiliado">Estos datos son <b>solo para registrarte como afiliado</b> — cuando alguien compre con tu código, aquí es donde te llegará tu comisión.</div>
 
-  <form id="f" autocomplete="off" onsubmit="return false">
+  <form id="f" onsubmit="return false">
     <div>
-      <label for="metodoPago">¿Cómo quieres que te paguemos tus comisiones?</label>
-      <select id="metodoPago" required>
-        <option value="" disabled selected>Cargando métodos…</option>
-      </select>
-    </div>
-
-    <p class="nota-bcv" id="notaBcv">💱 Los pagos por este método se calculan a la <b>tasa BCV</b> del día en que se procese tu pago, no 1 a 1 en dólares. Por ejemplo, si tu panel muestra $100 en saldo, lo que recibas en este método puede equivaler a menos de $100. Te lo detallamos siempre en el correo de cada pago.</p>
-
-    <!-- Campos para Pago Móvil -->
-    <div id="camposPagoMovil">
-      <div>
-        <label for="banco">Nombre del banco</label>
-        <input type="text" id="banco" placeholder="Ej: Banesco">
-      </div>
-      <div>
-        <label for="telefonoPago">Número de teléfono (Pago Móvil)</label>
-        <input type="tel" id="telefonoPago" placeholder="0412...">
-      </div>
-      <div>
-        <label for="cedula">Número de cédula</label>
-        <input type="text" id="cedula">
-      </div>
-    </div>
-
-    <!-- Campo para otros metodos (PayPal, Binance, Zelle, Zinli...) -->
-    <div id="camposOtroMetodo" style="display:none;">
-      <div>
-        <label for="cuentaOtroMetodo" id="labelCuentaOtroMetodo">Correo o usuario de tu cuenta</label>
-        <input type="text" id="cuentaOtroMetodo" placeholder="tucorreo@ejemplo.com">
-      </div>
-    </div>
-
-    <hr class="separador">
-    <p class="titulo-seccion">Acceso a tu panel de afiliado</p>
-    <p class="ayuda-campo">Con esto activamos de una vez tu usuario para que entres a ver tus comisiones y tu red — no tienes que registrarte por separado después.</p>
-    <div>
-      <label for="correoAcceso">Tu correo</label>
-      <input type="email" id="correoAcceso" required placeholder="tucorreo@ejemplo.com">
+      <label for="banco">Nombre del banco</label>
+      <input type="text" id="banco" required placeholder="Ej: Banesco">
     </div>
     <div>
-      <label for="claveAcceso">Crea una contraseña</label>
-      <input type="password" id="claveAcceso" required placeholder="Mínimo 6 caracteres" minlength="6">
+      <label for="telefonoPago">Número de teléfono (Pago Móvil)</label>
+      <input type="tel" id="telefonoPago" required placeholder="0412...">
     </div>
+    <div>
+      <label for="cedula">Número de cédula</label>
+      <input type="text" id="cedula" required>
+    </div>
+    <div>
+      <label for="correo">Correo electrónico</label>
+      <input type="email" id="correo" required autocomplete="email" placeholder="tucorreo@ejemplo.com">
+    </div>
+    <div>
+      <label for="clave">Crea una contraseña</label>
+      <input type="password" id="clave" required minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+    </div>
+    <div>
+      <label for="clave2">Repite la contraseña</label>
+      <input type="password" id="clave2" required minlength="8" autocomplete="new-password">
+    </div>
+    <p class="nota">Con este correo y contraseña entrarás a tu portal de afiliado para ver tus ventas, tu red y tus pagos.</p>
 
     <p class="err" id="err">No pudimos guardar tus datos. Verifica el link o inténtalo de nuevo.</p>
     <button type="submit" id="btn">Registrarme como afiliado</button>
@@ -225,14 +184,16 @@
       <circle cx="26" cy="26" r="24" stroke="#2c4a35" stroke-width="1.6"/>
       <path d="M16 27l7 7 14-15" stroke="#2c4a35" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <h2 id="tituloOk">¡Listo, ya eres afiliado!</h2>
-    <p>Guarda este código, también te lo repite Valentina por WhatsApp. En un momento te llega ahí mismo el link a tu panel, ya con tu correo y contraseña activos.</p>
+    <h2>¡Listo, ya eres afiliado!</h2>
+    <p>Guarda este código, también te lo repite Valentina por WhatsApp.</p>
+    <p id="notaAcceso"></p>
 
     <div class="caja-codigo">
       <div class="etiqueta">Tu código</div>
       <div class="codigo" id="codigoTexto">NA-00000</div>
       <a id="linkCatalogo" href="#" target="_blank" rel="noopener">🔗 Tu catálogo para compartir</a>
       <a id="linkCreativos" href="#" target="_blank" rel="noopener">🎨 Tus creativos listos</a>
+      <a id="linkPortal" href="#" target="_blank" rel="noopener">🔐 Tu portal de afiliado</a>
     </div>
     <a id="btnWhatsapp" class="btn-principal" style="display:block;text-decoration:none;text-align:center;margin-top:18px;" target="_blank" rel="noopener">Volver a WhatsApp ✅</a>
   </div>
@@ -266,14 +227,11 @@
   const SUPABASE_KEY = "sb_publishable_EKV8OM1y96u-DV_kUPGwkg_BZuGdf4D";
 
   const sb = {
-    rpc: async function(fn, params){
+    rpc: async function(fn, params, token){
       try{
         const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_KEY
-          },
+          headers: Object.assign({ "Content-Type": "application/json", "apikey": SUPABASE_KEY }, token ? { "Authorization": "Bearer " + token } : {}),
           body: JSON.stringify(params || {})
         });
         let data = null;
@@ -289,6 +247,34 @@
   };
 
   const WEBHOOK_MINI_FORMULARIOS = "https://hook.us2.make.com/mq6evphde7l2rhlyz0dosqgg4kspvks1";
+
+  // TODO: confirma que esta sea la URL real del portal
+  const URL_PORTAL = "https://portal.naturalezaabierta.com/";
+
+  async function authFetch(path, body){
+    try{
+      const r = await fetch(`${SUPABASE_URL}/auth/v1/${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "apikey": SUPABASE_KEY },
+        body: JSON.stringify(body)
+      });
+      return { ok: r.ok, j: await r.json().catch(() => ({})) };
+    }catch(_){ return { ok: false, j: {} }; }
+  }
+
+  // Crea la cuenta; si el correo ya existe, intenta entrar con la misma contraseña (permite reintentar).
+  async function obtenerSesion(email, password){
+    let r = await authFetch("signup", { email, password });
+    if(r.ok && r.j.access_token) return { ok: true, token: r.j.access_token };
+    if(r.ok) return { ok: false, msg: "No pudimos activar tu acceso ahora. Escríbele a Valentina por WhatsApp." };
+    const ya = r.j.error_code === "user_already_exists" || /already/i.test(r.j.msg || r.j.message || "");
+    if(ya){
+      r = await authFetch("token?grant_type=password", { email, password });
+      if(r.ok && r.j.access_token) return { ok: true, token: r.j.access_token };
+      return { ok: false, msg: "Ese correo ya tiene una cuenta con otra contraseña. Usa otro correo o entra directo a tu portal." };
+    }
+    return { ok: false, msg: "No pudimos crear tu acceso: " + (r.j.msg || r.j.message || "revisa el correo y la contraseña.") };
+  }
 
   function normalizarTelWa(t){
     if(!t) return null;
@@ -316,47 +302,13 @@
   const form = document.getElementById("f");
   const err = document.getElementById("err");
   const btn = document.getElementById("btn");
-  const selectMetodo = document.getElementById("metodoPago");
-  const notaBcv = document.getElementById("notaBcv");
-  const camposPagoMovil = document.getElementById("camposPagoMovil");
-  const camposOtroMetodo = document.getElementById("camposOtroMetodo");
-  const labelCuentaOtroMetodo = document.getElementById("labelCuentaOtroMetodo");
-  const cuentaOtroMetodo = document.getElementById("cuentaOtroMetodo");
 
-  const ETIQUETAS_CUENTA = {
-    "PayPal": "Correo de tu cuenta PayPal",
-    "Binance": "Correo o ID de usuario de Binance",
-    "Zelle": "Correo o teléfono asociado a tu Zelle",
-    "Zinli": "Correo de tu cuenta Zinli"
-  };
-
-  async function cargarMetodosPago(){
-    const { data, error } = await sb.rpc("fn_metodos_pago_tipos_activos", {});
-    selectMetodo.innerHTML = "";
-    let tipos = (!error && Array.isArray(data)) ? data.map(r => r.tipo) : [];
-    if(tipos.length === 0) tipos = ["Pago Móvil","Zelle","Binance","PayPal","Zinli"];
-    tipos.forEach(tipo => {
-      const opt = document.createElement("option");
-      opt.value = tipo; opt.textContent = tipo;
-      selectMetodo.appendChild(opt);
-    });
-    actualizarCamposMetodo();
+  function fallo(msg){
+    err.textContent = msg;
+    err.style.display = "block";
+    btn.disabled = false;
+    btn.textContent = "Registrarme como afiliado";
   }
-
-  function actualizarCamposMetodo(){
-    const metodo = selectMetodo.value;
-    const esPagoMovil = metodo === "Pago Móvil";
-    camposPagoMovil.style.display = esPagoMovil ? "" : "none";
-    camposOtroMetodo.style.display = esPagoMovil ? "none" : "";
-    notaBcv.classList.toggle("show", !esPagoMovil);
-    document.getElementById("banco").required = esPagoMovil;
-    document.getElementById("telefonoPago").required = esPagoMovil;
-    document.getElementById("cedula").required = esPagoMovil;
-    cuentaOtroMetodo.required = !esPagoMovil;
-    labelCuentaOtroMetodo.textContent = ETIQUETAS_CUENTA[metodo] || "Correo o usuario de tu cuenta";
-  }
-  selectMetodo.addEventListener("change", actualizarCamposMetodo);
-  cargarMetodosPago();
 
   const STORAGE_KEY = compraId ? `afiliado_enviado_${compraId}` : null;
 
@@ -370,10 +322,13 @@
 
   function mostrarOkGuardado(data){
     ocultarTodo();
-    document.getElementById("tituloOk").textContent = data.es_distribuidor ? "¡Listo, ya eres distribuidor!" : "¡Listo, ya eres afiliado!";
     document.getElementById("codigoTexto").textContent = data.codigo_propio;
     document.getElementById("linkCatalogo").href = data.link_catalogo;
     document.getElementById("linkCreativos").href = data.link_creativos;
+    document.getElementById("linkPortal").href = URL_PORTAL;
+    document.getElementById("notaAcceso").textContent = data.acceso_ok === false
+      ? "Tu registro quedó listo, pero falta activar tu acceso: entra al portal y toca «Activar mi cuenta»."
+      : (data.correo ? `Entra a tu portal con ${data.correo} y la contraseña que acabas de crear.` : "");
     const btnWa = document.getElementById("btnWhatsapp");
     const msg = `✅ Listo, ya registré mis datos de pago móvil. Mi código es ${data.codigo_propio}.`;
     btnWa.href = `https://wa.me/584221482602?text=${encodeURIComponent(msg)}`;
@@ -411,24 +366,22 @@
     btn.disabled = true;
     btn.textContent = "Registrando...";
 
-    const metodo = selectMetodo.value;
-    const esPagoMovil = metodo === "Pago Móvil";
-    const banco = esPagoMovil ? document.getElementById("banco").value.trim() : "";
-    const telefonoPago = esPagoMovil ? document.getElementById("telefonoPago").value.trim() : "";
-    const cedula = esPagoMovil ? document.getElementById("cedula").value.trim() : "";
-    const cuentaOtro = !esPagoMovil ? cuentaOtroMetodo.value.trim() : "";
-    const correoAcceso = document.getElementById("correoAcceso").value.trim();
-    const claveAcceso = document.getElementById("claveAcceso").value;
+    const banco = document.getElementById("banco").value.trim();
+    const telefonoPago = document.getElementById("telefonoPago").value.trim();
+    const cedula = document.getElementById("cedula").value.trim();
+    const correo = document.getElementById("correo").value.trim().toLowerCase();
+    const clave = document.getElementById("clave").value;
+
+    if(clave !== document.getElementById("clave2").value){ fallo("Las contraseñas no coinciden."); return; }
+    const ses = await obtenerSesion(correo, clave);
+    if(!ses.ok){ fallo(ses.msg); return; }
 
     const { data, error } = await sb.rpc("fn_registrar_datos_pago_movil", {
       p_compra_id: compraId,
       p_banco: banco,
       p_telefono_pago: telefonoPago,
       p_cedula: cedula,
-      p_numero_cuenta: cuentaOtro,
-      p_correo: correoAcceso,
-      p_tel_wa: telWa,
-      p_metodo_pago: metodo
+      p_tel_wa: telWa
     });
 
     if(error || !data || data.ok === false){
@@ -452,11 +405,14 @@
         return;
       }
 
-      err.style.display = "block";
-      btn.disabled = false;
-      btn.textContent = "Registrarme como afiliado";
+      fallo("No pudimos guardar tus datos. Verifica el link o inténtalo de nuevo.");
       return;
     }
+
+    // Vincula la cuenta recién creada con el afiliado de esta compra (usa la sesión del usuario).
+    const vin = await sb.rpc("vincular_afiliado_por_compra", { p_compra_id: compraId }, ses.token);
+    data.correo = correo;
+    data.acceso_ok = !vin.error && !(vin.data && vin.data.ok === false);
 
     // Exito: guardamos para que el link ya no se pueda volver a llenar desde este navegador.
     try{
@@ -472,10 +428,9 @@
       codigo_propio: data.codigo_propio,
       link_catalogo: data.link_catalogo,
       link_creativos: data.link_creativos,
-      metodo_pago: metodo,
-      es_distribuidor: !!data.es_distribuidor,
-      correo_acceso: correoAcceso,
-      clave_acceso: claveAcceso
+      correo: correo,
+      link_portal: URL_PORTAL,
+      acceso_ok: data.acceso_ok
     }) : false;
 
     if(enviado){
